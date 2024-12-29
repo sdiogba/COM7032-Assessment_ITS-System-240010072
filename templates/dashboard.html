@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-4">
+        <!-- Progress Card -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h4 class="mb-0">Your Progress</h4>
+            </div>
+            <div class="card-body">
+                <h5 class="mb-3">Level {{ user.level }}</h5>
+                <p class="mb-2">Score: {{ user.score }} / 50</p>
+                
+                <div class="progress mb-3">
+                    {% set progress = ((user.score/50)*100)|round|int %}
+                    {% set progress_class = 'progress-bar-' ~ ((progress//10)*10)|string %}
+                    <div class="progress-bar {{ progress_class }}"
+                         role="progressbar"
+                         aria-valuenow="{{ user.score }}"
+                         aria-valuemin="0"
+                         aria-valuemax="50">
+                         {{ progress }}%
+                    </div>
+                </div>
+                
+                <p class="mb-2">Total Problems: {{ performance.total_problems }}</p>
+                <p class="mb-0">Accuracy: {{ "%.1f"|format(performance.accuracy) }}%</p>
+            </div>
+        </div>
+
+        <!-- AI Recommendation Card -->
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">AI Recommendation</h4>
+            </div>
+            <div class="card-body">
+                <p class="mb-0">{{ performance.suggestion }}</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <!-- Recent Problems Card -->
+        <div class="card">
+            <div class="card-header">
+                <h4 class="mb-0">Recent Problems</h4>
+            </div>
+            <div class="card-body">
+                {% if recent_problems %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Problem</th>
+                                    <th>Your Answer</th>
+                                    <th>Result</th>
+                                    <th>Time</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for problem in recent_problems %}
+                                    <tr>
+                                        <td>{{ problem.problem }}</td>
+                                        <td>{{ "%.2f"|format(problem.student_answer) }}</td>
+                                        <td>
+                                            {% if problem.is_correct %}
+                                                <span class="badge bg-success">Correct</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">Incorrect</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ "%.1f"|format(problem.time_taken) }}s</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <p class="mb-0">No problems solved yet. Start practicing!</p>
+                    </div>
+                {% endif %}
+
+                <div class="text-center mt-4">
+                    <a href="{{ url_for('practice') }}" class="btn btn-lg btn-primary">
+                        Start Practice Session
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
